@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ComplianceGraph Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <main class="mx-auto max-w-7xl px-5 py-5 space-y-6">
+    <section class="rounded-md border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-100">
+      EU AI Act enforcement: Aug 2, 2026 · {{ days_until_enforcement }} days remaining for operational evidence.
+    </section>
+
+    <section class="grid gap-5 lg:grid-cols-[1.1fr_.9fr] fade-in">
+      <div class="rounded-md border border-slate-800 bg-slate-900 p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-sm uppercase tracking-wide text-slate-400">Agentic AI compliance posture</p>
+            <h1 class="mt-2 text-3xl font-semibold text-white">ComplianceGraph Scan {{ scan_id }}</h1>
+          </div>
+          <span class="tier-badge tier-{{ tier|replace('-','_') }}">{{ tier|upper }}</span>
+        </div>
+        <div class="mt-8 grid gap-6 sm:grid-cols-[220px_1fr]">
+          <div class="gauge" style="--score: {{ score }}">
+            <div class="gauge-fill"></div>
+            <div class="gauge-center"><strong>{{ score }}</strong><span>score</span></div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-slate-400 text-sm">Classifier confidence</p>
+              <p class="text-2xl font-semibold">{{ (confidence * 100)|round|int }}%</p>
+            </div>
+            <ul class="space-y-2 text-sm text-slate-300">
+              {% for factor in triggering_factors %}
+              <li class="rounded bg-slate-800/80 px-3 py-2">{{ factor }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-md border border-slate-800 bg-slate-900 p-6">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold">Compliance Scorecard</h2>
+          <a class="rounded bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-300" href="/report/{{ scan_id }}/pdf">Export PDF</a>
+        </div>
+        <canvas id="scoreChart" class="mt-5" height="260"></canvas>
+      </div>
+    </section>
+
+    <section class="rounded-md border border-slate-800 bg-slate-900 p-6 fade-in delayed">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Findings</h2>
+        <button id="sortButton" class="rounded border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">Sort by severity</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[760px] text-left text-sm" id="findingsTable">
+          <thead class="text-slate-400">
+            <tr class="border-b border-slate-800">
+              <th class="py-3">Obligation</th>
+              <th class="py-3">Status</th>
+              <th class="py-3">Severity</th>
+              <th class="py-3">Explanation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for finding in findings %}
+            <tr class="finding-row border-b border-slate-800/80" data-severity="{{ finding.severity_rank }}">
+              <td class="py-3 pr-4 font-medium text-white">{{ finding.obligation }}</td>
+              <td class="py-3"><span class="status status-{{ finding.status }}">{{ finding.status }}</span></td>
+              <td class="py-3">{{ finding.severity }}</td>
+              <td class="py-3 text-slate-300">
+                <details>
+                  <summary>{{ finding.reason }}</summary>
+                  <p class="mt-2 text-slate-400">{{ finding.explanation }}</p>
+                </details>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script>
+    const labels = {{ chart.labels|tojson }};
+    const met = {{ chart.met|tojson }};
+    const gaps = {{ chart.gaps|tojson }};
+    new Chart(document.getElementById('scoreChart'), {
+      type: 'bar',
+      data: { labels, datasets: [
+        { label: 'Met or partial', data: met, backgroundColor: '#22d3ee' },
+        { label: 'Gap', data: gaps, backgroundColor: '#f97316' }
+      ]},
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        scales: { x: { stacked: true, max: 100, ticks: { color: '#cbd5e1' } }, y: { stacked: true, ticks: { color: '#cbd5e1' } } },
+        plugins: { legend: { labels: { color: '#e2e8f0' } } }
+      }
+    });
+    document.getElementById('sortButton').addEventListener('click', () => {
+      const tbody = document.querySelector('#findingsTable tbody');
+      [...tbody.querySelectorAll('tr')].sort((a, b) => b.dataset.severity - a.dataset.severity).forEach(row => tbody.appendChild(row));
+    });
+  </script>
+</body>
+</html>

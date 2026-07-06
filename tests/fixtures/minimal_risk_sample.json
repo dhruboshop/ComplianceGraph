@@ -1,0 +1,15 @@
+{
+  "source": "manual",
+  "domain": "internal",
+  "autonomy_level": "low",
+  "human_oversight": true,
+  "decision_impacts_persons": false,
+  "logging_present": true,
+  "customer_facing": false,
+  "generative_or_chat": false,
+  "external_impact": false,
+  "tool_capabilities": ["read_docs", "summarize_policy"],
+  "documentation": ["technical_docs"],
+  "controls": [],
+  "tests": []
+}

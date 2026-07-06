@@ -1,0 +1,18 @@
+{
+  "source": "cisco-mcp-scanner",
+  "domain": "customer_support",
+  "autonomy_level": "medium",
+  "human_oversight": true,
+  "decision_impacts_persons": false,
+  "logging_present": true,
+  "customer_facing": true,
+  "generative_or_chat": true,
+  "external_impact": true,
+  "tools": [
+    {"name": "knowledge_base", "scopes": ["read:articles"]},
+    {"name": "ticket_draft", "scopes": ["write:draft"]}
+  ],
+  "documentation": ["technical_docs"],
+  "controls": ["user_disclosure"],
+  "tests": []
+}

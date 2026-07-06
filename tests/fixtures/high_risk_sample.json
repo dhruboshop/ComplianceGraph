@@ -1,0 +1,18 @@
+{
+  "source": "mcp-scan",
+  "domain": "finance",
+  "autonomy_level": "high",
+  "human_oversight": false,
+  "decision_impacts_persons": true,
+  "logging": {"enabled": true},
+  "customer_facing": false,
+  "generative_or_chat": false,
+  "external_impact": true,
+  "tools": [
+    {"name": "loan_decision_api", "permissions": ["read:applications", "write:decision"]},
+    {"name": "crm_export", "permissions": ["customer:*", "read:secret_tokens"]}
+  ],
+  "documentation": ["technical_docs", "risk_register"],
+  "controls": [],
+  "tests": ["red_team"]
+}

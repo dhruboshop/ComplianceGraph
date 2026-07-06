@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ComplianceGraph Audit Report</title>
+  <style>
+    @page { size: A4; margin: 22mm; }
+    body { font-family: Inter, Arial, sans-serif; color: #172033; }
+    h1 { font-size: 30px; margin-bottom: 6px; }
+    h2 { color: #0f766e; margin-top: 28px; }
+    .cover { border-bottom: 4px solid #0f766e; padding-bottom: 24px; margin-bottom: 28px; }
+    .badge { display: inline-block; padding: 8px 12px; border-radius: 4px; color: white; font-weight: 700; }
+    .tier-high-risk { background: #f97316; }
+    .tier-limited-risk { background: #eab308; color: #172033; }
+    .tier-minimal-risk { background: #16a34a; }
+    .tier-unacceptable { background: #dc2626; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border-bottom: 1px solid #d8dee9; padding: 9px; text-align: left; vertical-align: top; }
+    th { background: #eef2f7; }
+    .status-gap { color: #dc2626; font-weight: 700; }
+    .status-partial { color: #d97706; font-weight: 700; }
+    .status-met { color: #15803d; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <section class="cover">
+    <p>ComplianceGraph audit report</p>
+    <h1>EU AI Act Compliance Assessment</h1>
+    <p>Scan ID: {{ scan_id }}</p>
+    <p><span class="badge tier-{{ tier }}">{{ tier|upper }}</span> Confidence: {{ (confidence * 100)|round|int }}% · Compliance score: {{ score }}/100</p>
+  </section>
+  <h2>Triggering Factors</h2>
+  <ul>
+    {% for factor in triggering_factors %}<li>{{ factor }}</li>{% endfor %}
+  </ul>
+  <h2>Obligations Checklist</h2>
+  <table>
+    <thead><tr><th>Obligation</th><th>Status</th><th>Reason</th></tr></thead>
+    <tbody>
+      {% for finding in findings %}
+      <tr><td>{{ finding.obligation }}</td><td class="status-{{ finding.status }}">{{ finding.status }}</td><td>{{ finding.reason }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <h2>Remediation Steps</h2>
+  <ol>
+    <li>Close gap items with named control owners and dated evidence.</li>
+    <li>Retest tool permissions, wildcard scopes, logging, and credential exposure.</li>
+    <li>Refresh the PDF report after remediation and retain it with the technical file.</li>
+  </ol>
+</body>
+</html>
