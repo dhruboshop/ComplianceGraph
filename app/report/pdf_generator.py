@@ -69,7 +69,7 @@ def generate_pdf(scan_id: str, result: dict[str, Any], output_path: Path | None 
         from weasyprint import HTML
 
         pdf = HTML(string=html, base_url=str(TEMPLATE_DIR)).write_pdf()
-    except OSError:
+    except Exception:
         pdf = _fallback_pdf(scan_id, result)
     if output_path:
         output_path.parent.mkdir(parents=True, exist_ok=True)
